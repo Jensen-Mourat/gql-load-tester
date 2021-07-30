@@ -12,13 +12,11 @@ interface Query extends QueryOptions {
 
 interface PollingQuery extends Query{
     timer: number // milliseconds
-    stopOnError?: boolean;
 }
 
 interface Mutation extends MutationOptions {}
 
-interface ApolloConfig extends Omit<ApolloClientOptions<any>, 'cache'> {
-}
+interface ApolloConfig extends Omit<ApolloClientOptions<any>, 'cache'> {}
 
 interface Scenario {
     initialPollingQueries?: PollingQuery[]
@@ -39,7 +37,7 @@ interface Step {
 
 const cache = new InMemoryCache();
 
-export const ApolloLoadTester = ({apolloConfig, scenario} :{apolloConfig: ApolloConfig, scenario: Scenario}) => {
+export const LoadTester = ({apolloConfig, scenario} :{apolloConfig: ApolloConfig, scenario: Scenario}) => {
     const uri = apolloConfig.uri;
     const client = new ApolloClient({cache, link: new HttpLink({ uri, fetch, headers: apolloConfig.headers }), ...apolloConfig});
     const repeat = scenario.repeat ?? 1;
