@@ -4,7 +4,6 @@ interface Query extends QueryOptions {
 }
 interface PollingQuery extends Query {
     timer: number;
-    stopOnError?: boolean;
 }
 interface Mutation extends MutationOptions {
 }
@@ -23,7 +22,7 @@ interface Step {
     pollingQuery?: PollingQuery[];
     name: string;
 }
-export declare const ApolloLoadTester: ({ apolloConfig, scenario }: {
+export declare const LoadTester: ({ apolloConfig, scenario }: {
     apolloConfig: ApolloConfig;
     scenario: Scenario;
 }) => void;
