@@ -12,7 +12,6 @@
   "scripts": {
     "build": "tsc",
     "prepare": "yarn run build"
-
   },
   "author": "Jensen Mourat",
   "license": "Apache-2.0",
