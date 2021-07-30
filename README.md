@@ -1,5 +1,4 @@
 #gql-load-tester
-
 Load tester to simulate graphql based api (works only with Apollo queries) with uses the apollo client internally. Scenarios can be used to simulate user behaviours.
 
 #**Installation**
@@ -40,7 +39,7 @@ interface PollingQuery extends Query{
 }
 
 ```
-#**Example **
+#**Example**
 ```
 import {gql} from '@apollo/client';
 
