@@ -41,6 +41,22 @@ interface PollingQuery extends Query{
 ```
 #Example 
 ```
+import {gql} from '@apollo/client';
+
+const APP_VERSION_QUERY = gql` // example query
+  query version($os: String) {
+    version(os: $os) {
+      version
+    }
+  }
+`;
+
+export const PROFILE_QUERY = gql`  // example query
+  query profile {
+     name
+  }
+`;
+
 LoadTester({
         apolloConfig : {
           uri: '<Your Server Url>',
