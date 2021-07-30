@@ -1,4 +1,21 @@
 {
+  "name": "gql-load-tester",
+  "version": "1.0.0",
+  "description": "Load tester to simulate graphql based api (works only with Apollo queries). Senarios can be used to simulate user behaviours.",
+  "main": "index.js",
+  "repository": {
+    "url": "https://github.com/Jensen-Mourat/gql-load-tester",
+    "type": "git"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "yarn run build"
+
+  },
+  "author": "Jensen Mourat",
+  "license": "Apache License 2.0",
   "dependencies": {
     "@apollo/client": "^3.3.21",
     "@types/node-fetch": "^2.5.12",
@@ -6,5 +23,6 @@
     "graphql": "^15.5.1",
     "node-fetch": "^2.6.1",
     "rxjs": "^7.3.0"
-  }
+  },
+  "keywords": ["gql", "graphql", "load-tester", "testing", "apollo"]
 }
