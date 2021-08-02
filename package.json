@@ -1,6 +1,6 @@
 {
   "name": "gql-load-tester",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "Load tester to simulate graphql based api (works only with Apollo queries). Senarios can be used to simulate user behaviours.",
   "main": "lib/index.js",
   "repository": {
@@ -16,6 +16,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@apollo/client": "^3.3.21",
+    "@types/node": "^16.4.10",
     "cross-fetch": "^3.1.4",
     "graphql": "^15.5.1",
     "react": "^17.0.2",

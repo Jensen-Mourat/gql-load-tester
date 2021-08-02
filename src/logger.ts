@@ -37,7 +37,7 @@ export class Logger {
         let totalCalls = 0;
         let totalSuccess = 0;
         let totalFailed = 0;
-        this.map.forEach(((value,) => {
+        this.map.forEach(((value) => {
             totalCalls +=  value.total;
             totalSuccess +=  value.success.num;
             totalFailed +=  value.failed.num;
