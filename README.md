@@ -6,12 +6,23 @@ Scenarios can be used to simulate user behaviours.
 ```
   npm i gql-load-tester
   yarn add gql-load-tester
+  
+  using ts-node is advised (https://www.npmjs.com/package/ts-node)
+   npm install -g typescript
+   npm install -g ts-node
+   
+  but its also possible to run it with node js (not fully tested)
+  
 ```
 
 
 #**Usage** 
 
-import and run the ```LoadTester``` function
+Create a `.ts` file. \
+import and run the `LoadTester` function and your queries (assuming they are written in typescript).\
+run `ts-node <your .ts file>`.
+
+(the process should be similar with node but using `.js` file)
 
 #**API**
 ```
