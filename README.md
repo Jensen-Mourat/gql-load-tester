@@ -1,9 +1,11 @@
 
-Load tester to simulate graphql based api (works only with Apollo queries) with uses the apollo client internally. Scenarios can be used to simulate user behaviours.
+Load tester to simulate graphql based api (currently only works with Apollo graphql queries). 
+Scenarios can be used to simulate user behaviours.
 
 #**Installation**
 ```
   npm i gql-load-tester
+  yarn add gql-load-tester
 ```
 
 
