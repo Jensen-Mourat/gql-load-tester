@@ -22,11 +22,11 @@ LoadTester({
 });
 
 interface Scenario {
-    initialPollingQueries?: PollingQuery[] // a polling queries can be also initialised
+    initialPollingQueries?: PollingQuery[] // polling queries here will be started initially
     steps: Step[];
     runtime: number; // amount of time the scenario will run (in ms)
     repeat: number; // amount of times the scenario is repeated
-    deferBy?: number; // interval between repeating scenarios
+    deferBy?: number; // interval between repeating scenarios (in ms)
 }
 
 interface Step { // Steps for the scenario, each step is carried out sequentially
