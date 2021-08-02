@@ -16,11 +16,9 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@apollo/client": "^3.3.21",
-    "@types/node-fetch": "^2.5.12",
     "cross-fetch": "^3.1.4",
     "gql-load-tester": "^1.0.9",
     "graphql": "^15.5.1",
-    "node-fetch": "^2.6.1",
     "react": "^17.0.2",
     "rxjs": "^7.3.0"
   },
@@ -29,6 +27,8 @@
     "graphql",
     "load-tester",
     "testing",
-    "apollo"
+    "apollo",
+    "load-testing",
+    "typescript"
   ]
 }
