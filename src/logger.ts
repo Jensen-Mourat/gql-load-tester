@@ -70,7 +70,7 @@ export class Logger {
             console.log(' Average call time: ', this.getAverage(value.time) + 'ms')
             if(value.errors.length > 0){
                 errors = true;
-                fs.writeFileSync(`${__dirname}/errors/${key.replace(' ', '')}-log.json`, JSON.stringify(value.errors, null, 2), {flag: 'w'})
+                fs.writeFileSync(`${__dirname}\\errors\\${key.replace(' ', '')}-log.json`, JSON.stringify(value.errors, null, 2), {flag: 'w'})
             }
         }))
         if(errors){
