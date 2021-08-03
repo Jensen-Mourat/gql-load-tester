@@ -22,7 +22,11 @@
     "graphql": "^15.5.1",
     "paralleljs": "^1.1.0",
     "react": "^17.0.2",
-    "rxjs": "^7.3.0"
+    "rxjs": "^7.3.0",
+    "threads": "^1.6.5",
+    "tiny-worker": "^2.3.0",
+    "ts-node": "^10.1.0",
+    "typescript": "^4.3.5"
   },
   "keywords": [
     "gql",

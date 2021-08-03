@@ -107,3 +107,4 @@ dist
 
 run.ts
 yarn.lock
+src/errors
