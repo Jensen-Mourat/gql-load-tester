@@ -162,7 +162,7 @@ export const runRequest = (request: Query | Mutation, type: 'query' | 'mutation'
                         extraInfo,
                         networkError}: ApolloError) => {
                 const time = calculateTimeElapsed(initialTime);
-                const log: Log = {stepName, callName: name, time, type: 'failed', data: {graphQLErrors, message, extraInfo, networkError: {name: networkError?.name, message: networkError?.message, stack: networkError?.stack}}}
+                const log: Log = {stepName, callName: name, time, type: 'failed', data: {callName: name, stepName, graphQLErrors, message, extraInfo, networkError: {name: networkError?.name, message: networkError?.message, stack: networkError?.stack}}}
                 console.log(`Error ${type}: "${name}" , elapsed time: ${time}ms`);
                 resolve(log)
             });
