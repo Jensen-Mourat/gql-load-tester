@@ -1,4 +1,4 @@
-import {ApolloClient, DocumentNode, HttpLink, InMemoryCache} from '@apollo/client/core';
+import {ApolloClient, ApolloError, DocumentNode, HttpLink, InMemoryCache} from '@apollo/client/core';
 import {ApolloClientOptions} from '@apollo/client/core/ApolloClient';
 import fetch from 'cross-fetch';
 import {MutationOptions, QueryOptions} from '@apollo/client/core/watchQueryOptions';
@@ -51,7 +51,7 @@ export const LoadTester = ({apolloConfig, scenario} :{apolloConfig: ApolloConfig
         process.exit(0)
     })
     for (let i = 0; i < repeat; i++){
-        spawn<ProcessScenario>(new Worker("./workers/processScenario.ts"))
+        spawn<ProcessScenario>(new Worker("./workers/processScenario"))
             .then(w => {
                     w.process({scenario, uri: uri as string, apolloConfig})
                         .then((value: Log[]) => {
@@ -157,9 +157,12 @@ export const runRequest = (request: Query | Mutation, type: 'query' | 'mutation'
                 console.log(`${type} "${name}" completed, elapsed time: ${time}ms`);
                 resolve(log)
             })
-            .catch((e: Error) => {
+            .catch(({graphQLErrors,
+                        message,
+                        extraInfo,
+                        networkError}: ApolloError) => {
                 const time = calculateTimeElapsed(initialTime);
-                const log: Log = {stepName, callName: name, time, type: 'failed', data: {message: e.message, stack: e.stack, name: name}}
+                const log: Log = {stepName, callName: name, time, type: 'failed', data: {graphQLErrors, message, extraInfo, networkError: {name: networkError?.name, message: networkError?.message, stack: networkError?.stack}}}
                 console.log(`Error ${type}: "${name}" , elapsed time: ${time}ms`);
                 resolve(log)
             });
