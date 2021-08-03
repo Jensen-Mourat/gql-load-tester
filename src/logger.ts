@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as path from 'path';
 
 interface Data {
     total: number;
@@ -70,15 +71,15 @@ export class Logger {
             console.log(' Average call time: ', this.getAverage(value.time) + 'ms')
             if(value.errors.length > 0){
                 errors = true;
-                if (!fs.existsSync(`${__dirname}\\errors\\`)){
-                    fs.mkdirSync(`${__dirname}\\errors\\`);
+                if (!fs.existsSync(`${__dirname}${path.sep}errors`)){
+                    fs.mkdirSync(`${__dirname}${path.sep}errors`);
                 }
-                fs.writeFileSync(`${__dirname}\\errors\\${key.replace(' ', '')}-log.json`, JSON.stringify(value.errors, null, 2), {flag: 'w'})
+                fs.writeFileSync(`${__dirname}${path.sep}errors${path.sep}${key.replace(' ', '')}-log.json`, JSON.stringify(value.errors, null, 2), {flag: 'w'})
             }
         }))
         if(errors){
             console.log('')
-            console.log(`There was some errors. To see the error logs please check ${__dirname}\\errors`)
+            console.log(`There was some errors. To see the error logs please check ${__dirname}${path.sep}errors`)
         }
     }
 
