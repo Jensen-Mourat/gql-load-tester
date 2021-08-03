@@ -5,26 +5,32 @@ interface Data {
     time: number[];
 }
 
+export interface Log {
+  stepName: string;
+  callName: string;
+  time: number;
+  type: 'failed' | 'success'
+}
+
 export class Logger {
     private map = new Map<string, Data>()
 
-
-    logCall(stepname: string, callname: string, time: number, type: 'failed' | 'success' ){
-        let request = this.map.get(callname);
+    logCall({stepName, callName, time, type}: Log  ){
+        let request = this.map.get(callName);
         if(!request){
              request = {
-                 failed: type === 'failed' ? {num: 1, atStep: new Set([stepname])} : {num: 0, atStep: new Set()},
+                 failed: type === 'failed' ? {num: 1, atStep: new Set([stepName])} : {num: 0, atStep: new Set()},
                  total: 1,
-                 success: type === 'success' ? {num: 1, atStep: new Set([stepname])} : {num: 0, atStep: new Set()},
+                 success: type === 'success' ? {num: 1, atStep: new Set([stepName])} : {num: 0, atStep: new Set()},
                  time: [time]
              }
-            this.map.set(callname, request)
+            this.map.set(callName, request)
         } else{
-            this.map.set(callname, {
+            this.map.set(callName, {
                 total: request.total + 1,
                 time: [...request.time, time],
-                failed: type === 'failed' ? {num: request.failed.num + 1, atStep: request.failed.atStep.add(stepname)} : {num: request.failed.num, atStep: request.failed.atStep},
-                success: type === 'success' ? {num: request.success.num + 1, atStep: request.success.atStep.add(stepname)} : {num: request.success.num, atStep: request.success.atStep},
+                failed: type === 'failed' ? {num: request.failed.num + 1, atStep: request.failed.atStep.add(stepName)} : {num: request.failed.num, atStep: request.failed.atStep},
+                success: type === 'success' ? {num: request.success.num + 1, atStep: request.success.atStep.add(stepName)} : {num: request.success.num, atStep: request.success.atStep},
             })
         }
     }
