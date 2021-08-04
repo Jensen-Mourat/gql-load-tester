@@ -2,8 +2,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as bar from 'cli-progress';
 import {cyan} from 'colors';
-
-import {switchMap, tap, timer} from 'rxjs';
 interface Data {
     total: number;
     failed: { num: number, atStep: Set<string> };
