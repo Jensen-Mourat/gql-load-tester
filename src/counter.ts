@@ -12,10 +12,14 @@ export class CountDown {
         this.done.subscribe(_ => whenDone())
     }
 
-    next(){
+    decrease(){
         this.takeUntil --;
         if(this.takeUntil < 1){
             this.done.next()
         }
+    }
+
+    increase() {
+        this.takeUntil ++;
     }
 }

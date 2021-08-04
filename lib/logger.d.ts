@@ -10,4 +10,5 @@ export declare class Logger {
     logCall({ stepName, callName, time, type, data }: Log): void;
     print(): void;
     private getAverage;
+    private startBar;
 }

@@ -5,7 +5,7 @@ import {MutationOptions, QueryOptions} from '@apollo/client/core/watchQueryOptio
 import {interval, lastValueFrom, mergeMap, observable, Observable, scan, Subscriber, switchMap, tap, timer} from 'rxjs';
 import {Log, Logger} from './logger';
 import {CountDown} from './counter';
-import { spawn, Thread, Worker } from "threads"
+import {ModuleThread, spawn, Thread, Worker} from "threads";
 import {ProcessScenario} from './workers/processScenario';
 
 
@@ -24,8 +24,6 @@ interface ApolloConfig extends Omit<ApolloClientOptions<any>, 'cache'> {}
 interface Scenario {
     initialPollingQueries?: PollingQuery[]
     steps: Step[];
-    repeat?: number;
-    runtime?: number;
     gradualIncreaseRate?:number;
     deferBy?: number;
 }
@@ -38,30 +36,83 @@ interface Step {
     wait?: number;
 }
 
+interface ILoadTester {
+    apolloConfig: ApolloConfig;
+    duration?: number;
+    scenario: Scenario;
+    parallelUsers: number;
+}
 
+const displayLog = false;
 
-const cache = new InMemoryCache();
-
-export const LoadTester = ({apolloConfig, scenario} :{apolloConfig: ApolloConfig, scenario: Scenario}) => {
+export const loadTester = ({apolloConfig, scenario, duration , parallelUsers} : ILoadTester) => {
+    if(duration! < 1){
+        throw new Error('Duration cannot be less than 1 second')
+    } else if(duration) {
+        duration = duration * 1000
+    }
     const uri = apolloConfig.uri;
-    const repeat = scenario.repeat ?? 1;
+    const repeat = parallelUsers ?? 1;
     const logger = new Logger();
+    logger.startBar();
     const counter = new CountDown(repeat, () => {
-        logger.print();
-        process.exit(0)
+        logger.updateBar(100, 'done, processing data', 'set')
+        timer(2000).subscribe(_ => {
+            logger.print();
+            process.exit(0);
+        })
     })
-    for (let i = 0; i < repeat; i++){
-        spawn<ProcessScenario>(new Worker("./workers/processScenario"))
-            .then(w => {
-                    w.process({scenario, uri: uri as string, apolloConfig})
-                        .then((value: Log[]) => {
-                            value.forEach(v => logger.logCall(v));
-                            counter.next();
-                            Thread.terminate(w);
-                        });
+    let durationDone = false;
+    consoleLog('spawning workers');
+    logger.updateBar(10, 'spawning worker threads', 'inc');
+    const spawnWorker = () => {
+        spawn<ProcessScenario>(new Worker("./workers/processScenario"), {timeout: 500000})
+            .then((w) => {
+                    workerTask(w)
                 }
             )
-
+    }
+    const workerTask = (w: any) => {
+        w.process({scenario, uri: uri as string, apolloConfig})
+            .then((value: Log[]) => {
+                value.forEach(v => logger.logCall(v));
+                if(!duration){
+                    logger.updateBar((1 / repeat) *  100, 'Worker: Scenario complete, closing thread', 'inc')
+                    counter.decrease();
+                    Thread.terminate(w);
+                } else {
+                    if(durationDone){
+                        logger.updateBar((1 / repeat) *  100, 'Worker: Scenario complete, closing thread', 'inc')
+                        counter.decrease();
+                        Thread.terminate(w);
+                    } else {
+                        logger.updateBar(1 , 'Worker: Scenario complete, simulating new scenario', 'inc')
+                        workerTask(w)
+                    }
+                }
+            })
+            .catch((e: any) => {
+                if(!duration){
+                    logger.updateBar((1 / repeat) *  100, 'Worker: Error, closing thread', 'inc')
+                    counter.decrease();
+                    Thread.terminate(w);
+                } else {
+                    if(durationDone){
+                        logger.updateBar((1 / repeat) *  100, 'Worker: Error, closing thread', 'inc')
+                        counter.decrease();
+                        Thread.terminate(w);
+                    } else {
+                        logger.updateBar(1 , 'Worker: Scenario complete, simulating new scenario', 'inc')
+                        workerTask(w)
+                    }
+                }
+            });
+    }
+    if(duration){
+        timer(duration).subscribe(_ => durationDone = true )
+    }
+    for (let i = 0; i < repeat; i++){
+        spawnWorker()
         // if(scenario.runtime){
         //     timer(scenario.runtime).subscribe(_ => counter.next())
         // }
@@ -81,7 +132,7 @@ export const LoadTester = ({apolloConfig, scenario} :{apolloConfig: ApolloConfig
     }
 }
 
-export const recursiveSteps = ({steps, client, stopAfterSteps, observer}: { steps: Step[], client: ApolloClient<any>, stopAfterSteps?: boolean,observer: Subscriber<Log> }) => {
+export const recursiveSteps = ({steps, client, observer}: { steps: Step[], client: ApolloClient<any>,observer: Subscriber<Log> }) => {
     if(steps.length > 0){
         const [step, ...tail] = steps;
         if(step.pollingQuery && step.pollingQuery.length > 0){
@@ -90,38 +141,39 @@ export const recursiveSteps = ({steps, client, stopAfterSteps, observer}: { step
         }
         if(step.query || step.mutation){
             if(step.query && step.mutation){
-                console.log('Error: A step can only have one type of request, step: ', step.name)
+                consoleLog('Error: A step can only have one type of request, step: ', step.name)
             } else{
                 runRequest(step.query ?? step.mutation!, step.query ? 'query' : 'mutation', step.name, client)
                     .then((v) => {
                         observer.next(v)
                         if(step.wait){
                             timer(step.wait).subscribe(_ =>
-                                recursiveSteps({steps: tail, client, stopAfterSteps, observer}))
+                                recursiveSteps({steps: tail, client, observer}))
                         } else{
-                            recursiveSteps({steps: tail, client, stopAfterSteps, observer});
+                            recursiveSteps({steps: tail, client, observer});
                         }
                     })
             }
         } else {
             if(!step.pollingQuery || step.pollingQuery.length === 0){
-                console.log('Error: add a query, mutation or polling query to the step: ', step.name)
+                consoleLog('Error: add a query, mutation or polling query to the step: ', step.name)
             }
         }
-    }else if(stopAfterSteps){
-        observer.complete()
+    } else{
+        observer.complete();
     }
 }
 
 export const processScenario = ({scenario, uri, apolloConfig}: {scenario: Scenario, uri: string, apolloConfig: ApolloConfig}) => {
+    const cache = new InMemoryCache();
     const client = new ApolloClient({cache, link: new HttpLink({ uri, fetch, headers: apolloConfig.headers }), ...apolloConfig});
     const scenario$ = new Observable<Log>((observer) => {
         if(scenario.initialPollingQueries && scenario.initialPollingQueries.length > 0){
-            console.log('starting initial polling');
+            consoleLog('starting initial polling');
             scenario.initialPollingQueries?.forEach(p => runPollingQuery({pollingQuery: p,stepName: 'Initial Polling', client, observer}))
         }
         if(scenario.steps.length > 0){
-            recursiveSteps({steps:scenario.steps, client, stopAfterSteps:  !scenario.runtime, observer});
+            recursiveSteps({steps:scenario.steps, client, observer});
         }
     })
     return lastValueFrom(scenario$.pipe(scan((a: Log[], c: Log) => [...a, c], [])));
@@ -154,7 +206,7 @@ export const runRequest = (request: Query | Mutation, type: 'query' | 'mutation'
             .then(v => {
                 const time = calculateTimeElapsed(initialTime);
                 const log: Log = {stepName, callName: name, time, type: 'success'}
-                console.log(`${type} "${name}" completed, elapsed time: ${time}ms`);
+                consoleLog(`${type} "${name}" completed, elapsed time: ${time}ms`);
                 resolve(log)
             })
             .catch(({graphQLErrors,
@@ -163,15 +215,20 @@ export const runRequest = (request: Query | Mutation, type: 'query' | 'mutation'
                         networkError}: ApolloError) => {
                 const time = calculateTimeElapsed(initialTime);
                 const log: Log = {stepName, callName: name, time, type: 'failed', data: {callName: name, stepName, graphQLErrors, message, extraInfo, networkError: {name: networkError?.name, message: networkError?.message, stack: networkError?.stack}}}
-                console.log(`Error ${type}: "${name}" , elapsed time: ${time}ms`);
+                consoleLog(`Error ${type}: "${name}" , elapsed time: ${time}ms`);
                 resolve(log)
             });
     }))
 }
 
-const calculateTimeElapsed = (start: number) => {
+export const calculateTimeElapsed = (start: number) => {
     return (Date.now() - start)
 }
 
+export const consoleLog = (...s: any[]) => {
+    if(displayLog){
+        console.log(s)
+    }
+}
 
 
