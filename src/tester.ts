@@ -5,7 +5,7 @@ import {MutationOptions, QueryOptions} from '@apollo/client/core/watchQueryOptio
 import {interval, lastValueFrom, mergeMap, observable, Observable, scan, Subscriber, switchMap, tap, timer} from 'rxjs';
 import {Log, Logger} from './logger';
 import {CountDown} from './counter';
-import {ModuleThread, spawn, Thread, Worker} from "threads";
+import { spawn, Thread, Worker} from "threads";
 import {ProcessScenario} from './workers/processScenario';
 
 
@@ -24,8 +24,6 @@ interface ApolloConfig extends Omit<ApolloClientOptions<any>, 'cache'> {}
 interface Scenario {
     initialPollingQueries?: PollingQuery[]
     steps: Step[];
-    gradualIncreaseRate?:number;
-    deferBy?: number;
 }
 
 interface Step {

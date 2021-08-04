@@ -27,18 +27,18 @@ Scenarios can be used to simulate user behaviours.
 
 #**API**
 ```
-
-LoadTester({
-   apolloConfig: ApolloConfig, // Check apollo client config https://www.npmjs.com/package/@apollo/client
-   scenario: Scenario
-});
+interface ILoadTester {
+    apolloConfig: ApolloConfig, // Check apollo client config https://www.npmjs.com/package/@apollo/client
+    duration?: number; // in seconds, specified how long the test should run.
+                       // If a scenario completes before the duration ends, the scenario will be repeated
+                       // Not specifying duration will run the users only once
+    scenario: Scenario;
+    parallelUsers: number; // number of users running a Scenario at any point in time
+}
 
 interface Scenario {
-    initialPollingQueries?: PollingQuery[] // polling queries here will be started initially
+    initialPollingQueries?: PollingQuery[]
     steps: Step[];
-    runtime: number; // amount of time the scenario will run (in ms)
-    repeat: number; // amount of times the scenario is repeated
-    deferBy?: number; // interval between repeating scenarios (in ms)
 }
 
 interface Step { // Steps for the scenario, each step is carried out sequentially
@@ -74,12 +74,11 @@ export const PROFILE_QUERY = gql`  // example query
 LoadTester({
         apolloConfig : {
           uri: '<Your Server Url>',
-          headers: { authorization: `XXXX`}
+          headers: { authorization: `Bearer XXXX`}
         },
+        parallelUsers: 20,
+        duration: 20,
         scenario:{
-          runtime: 2000, 
-          repeat: 5, 
-          deferBy: 500, 
           steps:[{ 
               name: 'Profile',
               query: {

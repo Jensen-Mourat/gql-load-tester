@@ -7,8 +7,11 @@ export interface Log {
 }
 export declare class Logger {
     private map;
+    private pBar;
+    private total;
     logCall({ stepName, callName, time, type, data }: Log): void;
     print(): void;
     private getAverage;
-    private startBar;
+    startBar(): void;
+    updateBar(num: number, payload: string, type: 'inc' | 'set'): void;
 }

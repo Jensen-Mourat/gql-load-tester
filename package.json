@@ -39,6 +39,6 @@
   ],
   "devDependencies": {
     "@types/cli-progress": "^3.9.2",
-    "gql-load-tester": "^1.0.17"
+    "gql-load-tester": "^1.1.0"
   }
 }
