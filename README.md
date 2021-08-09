@@ -20,7 +20,7 @@ Scenarios can be used to simulate user behaviours.
 #**Usage** 
 
 * Create a `.ts` file. 
-* import and run the `LoadTester` function and your queries (assuming they are written in typescript).
+* import and run the `loadTester` function and your queries (assuming they are written in typescript).
 * run `ts-node <your .ts file>`.
 
 (the process should be similar when using node and using a `.js` file)
@@ -71,7 +71,7 @@ export const PROFILE_QUERY = gql`  // example query
   }
 `;
 
-LoadTester({
+loadTester({
         apolloConfig : {
           uri: '<Your Server Url>',
           headers: { authorization: `Bearer XXXX`}
