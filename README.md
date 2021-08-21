@@ -1,8 +1,8 @@
 
-Load tester to simulate graphql based api (currently only works with Apollo graphql queries). 
+Load tester to simulate and load test graphql based api (currently only works with Apollo graphql queries). 
 Scenarios can be used to simulate user behaviours.
 
-#**Installation**
+# **Installation**
 ```
   npm i gql-load-tester
   yarn add gql-load-tester
@@ -17,7 +17,7 @@ Scenarios can be used to simulate user behaviours.
 
 
 
-#**Usage** 
+# **Usage** 
 
 * Create a `.ts` file. 
 * import and run the `loadTester` function and your queries (assuming they are written in typescript).
@@ -25,7 +25,7 @@ Scenarios can be used to simulate user behaviours.
 
 (the process should be similar when using node and using a `.js` file)
 
-#**API**
+# **API**
 ```
 interface ILoadTester {
     apolloConfig: ApolloConfig, // Check apollo client config https://www.npmjs.com/package/@apollo/client
@@ -53,7 +53,7 @@ interface PollingQuery extends Query{
 }
 
 ```
-#**Example**
+# **Example**
 ```
 import {gql} from '@apollo/client';
 
